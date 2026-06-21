@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV Home</title>
+    <style>
+        :root { --bg: #050505; --focus-glow: #3b82f6; }
+        body { margin: 0; padding: 50px; background: var(--bg); background-image: radial-gradient(circle at top right, #1e293b, #050505); min-height: 100vh; font-family: sans-serif; color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        .tv-grid { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        
+        .app-card { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px;
+            backdrop-filter: blur(10px); border: 2px solid transparent;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-decoration: none; color: white; outline: none; 
+        }
+
+        .app-card:focus, .app-card:hover {
+            transform: scale(1.15) translateY(-10px);
+            background: rgba(255,255,255,0.15);
+            border: 2px solid var(--focus-glow);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .app-icon { border-radius: 15px; object-fit: cover; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .app-card:focus .app-icon { box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        
+        .app-name { margin-top: 15px; font-weight: 600; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="tv-grid" id="tvGrid"></div>
+
+    <script>
+        // ✅ यहाँ अपडेट किया गया है (सिर्फ /api)
+        const API = '/api';
+
+        async function loadTVInterface() {
+            try {
+                const res = await fetch(`${API}/data`);
+                const data = await res.json();
+
+                const grid = document.getElementById('tvGrid');
+                grid.innerHTML = '';
+
+                data.apps.forEach(app => {
+                    grid.innerHTML += `
+                        <a href="${app.link}" class="app-card" tabindex="0">
+                            <img src="${app.icon}" class="app-icon" 
+                                 style="width: ${data.settings.iconSize}px; height: ${data.settings.iconSize}px;">
+                            <span class="app-name" style="font-size: ${data.settings.textSize}px;">${app.name}</span>
+                        </a>
+                    `;
+                });
+            } catch (error) {
+                console.error("Data load failed:", error);
+            }
+        }
+
+        loadTVInterface();
+        setInterval(loadTVInterface, 5000); 
+    </script>
+</body>
+</html>
