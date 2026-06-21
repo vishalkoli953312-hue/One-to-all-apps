@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV App - Premium Admin Control</title>
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+        }
+
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        h2 { margin-bottom: 20px; font-weight: 600; color: var(--primary); font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #94a3b8; }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
+
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); margin-top: 20px; }
+
+        /* Sliders */
+        .settings-box { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border); }
+        input[type="range"] { width: 100%; height: 6px; background: #334155; border-radius: 5px; outline: none; accent-color: var(--primary); margin: 10px 0; }
+
+        /* App List */
+        .app-list { display: flex; flex-direction: column; gap: 15px; max-height: 70vh; overflow-y: auto; padding-right: 10px; }
+        .app-list::-webkit-scrollbar { width: 5px; }
+        .app-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .app-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .app-card:hover { background: rgba(255,255,255,0.07); border-color: var(--primary); }
+
+        .app-info { display: flex; align-items: center; gap: 15px; }
+        .app-info img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; background: #000; border: 1px solid var(--border); }
+        .app-info .details p { font-weight: 600; font-size: 0.95rem; }
+        .app-info .details small { color: #64748b; font-size: 0.75rem; }
+
+        .actions { display: flex; gap: 8px; }
+        .actions button {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-edit { background: var(--warning); color: #000; }
+        .btn-del { background: var(--danger); color: white; }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="panel">
+            <h2><span>🚀</span> Create New App</h2>
+            <input type="hidden" id="appId">
+            
+            <div class="form-group">
+                <label>App Name</label>
+                <input type="text" id="appName" placeholder="Jaise: Netflix, YouTube">
+            </div>
+            
+            <div class="form-group">
+                <label>Website URL / HTML Link</label>
+                <input type="url" id="appLink" placeholder="https://www.google.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Icon URL (Optional)</label>
+                <input type="text" id="appIcon" placeholder="Khali chhodein auto-icon ke liye">
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveApp()">Save / Create App</button>
+
+            <div class="settings-box">
+                <h2><span>⚙️</span> UI Settings</h2>
+                <label>Icon Size: <span id="iconSizeVal" style="color:var(--primary); font-weight:bold;">100</span>px</label>
+                <input type="range" id="iconSize" min="50" max="250" value="100" oninput="updateDisp()">
+                
+                <label>Text Size: <span id="textSizeVal" style="color:var(--primary); font-weight:bold;">16</span>px</label>
+                <input type="range" id="textSize" min="12" max="40" value="16" oninput="updateDisp()">
+                
+                <button class="btn btn-success" onclick="saveSettings()">Apply Global Settings</button>
+            </div>
+        </div>
+
+        <!-- List Section -->
+        <div class="panel">
+            <h2><span>📱</span> Managed Apps</h2>
+            <div class="app-list" id="appList">
+                <!-- App items will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'api.php';
+
+        // 1. Load All Data
+        async function loadData() {
+            try {
+                const res = await fetch(API);
+                if (!res.ok) throw new Error("Server not responding");
+                const data = await res.json();
+                
+                // Set Sliders
+                document.getElementById('iconSize').value = data.settings.iconSize;
+                document.getElementById('textSize').value = data.settings.textSize;
+                updateDisp();
+
+                // Render List
+                const list = document.getElementById('appList');
+                list.innerHTML = '';
+                
+                if (data.apps.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; padding:50px; color:#64748b;">Koi Apps nahi hain. Add karein!</div>';
+                }
+
+                data.apps.forEach(app => {
+                    list.innerHTML += `
+                        <div class="app-card">
+                            <div class="app-info">
+                                <img src="${app.icon}" onerror="this.src='https://via.placeholder.com/100?text=App'">
+                                <div class="details">
+                                    <p>${app.name}</p>
+                                    <small>${app.link.substring(0, 30)}...</small>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-edit" onclick="editApp('${app.id}', '${app.name}', '${app.link}', '${app.icon}')">Edit</button>
+                                <button class="btn-del" onclick="deleteApp('${app.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error("Fetch Error:", err);
+            }
+        }
+
+        // 2. Save App (Create or Update)
+        async function saveApp() {
+            const id = document.getElementById('appId').value;
+            const name = document.getElementById('appName').value;
+            const link = document.getElementById('appLink').value;
+            let icon = document.getElementById('appIcon').value;
+
+            if (!name || !link) {
+                alert("Naam aur Link bharna zaroori hai!");
+                return;
+            }
+
+            // Auto-Icon logic
+            if (!icon) {
+                try {
+                    const url = new URL(link);
+                    icon = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
+                } catch (e) {
+                    icon = `https://via.placeholder.com/128?text=${name.charAt(0)}`;
+                }
+            }
+
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    body: JSON.stringify({ id, name, link, icon })
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                    alert(id ? "App Update Ho Gaya!" : "Naya App Create Ho Gaya!");
+                    location.reload();
+                } else {
+                    alert("Error: " + result.error);
+                }
+            } catch (err) {
+                alert("Fatal Error: Server se connection nahi ho paya. Database.json ki permissions check karein.");
+            }
+        }
+
+        // 3. Edit App
+        function editApp(id, name, link, icon) {
+            document.getElementById('appId').value = id;
+            document.getElementById('appName').value = name;
+            document.getElementById('appLink').value = link;
+            document.getElementById('appIcon').value = icon;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. Delete App
+        async function deleteApp(id) {
+            if (!confirm("Kya aap is app ko delete karna chahte hain?")) return;
+            
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'delete', id: id })
+                });
+                const result = await res.json();
+                if (result.success) loadData();
+            } catch (err) {
+                alert("Delete fail ho gaya.");
+            }
+        }
+
+        // 5. Update UI Settings
+        function updateDisp() {
+            document.getElementById('iconSizeVal').innerText = document.getElementById('iconSize').value;
+            document.getElementById('textSizeVal').innerText = document.getElementById('textSize').value;
+        }
+
+        async function saveSettings() {
+            const iconSize = document.getElementById('iconSize').value;
+            const textSize = document.getElementById('textSize').value;
+
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    body: JSON.stringify({ iconSize, textSize })
+                });
+                const result = await res.json();
+                if (result.success) alert("Settings Update Ho Gayi Hain!");
+            } catch (err) {
+                alert("Settings save nahi ho payi.");
+            }
+        }
+
+        // Start
+        loadData();
+    </script>
+</body>
+</html>
